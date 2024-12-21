@@ -19,7 +19,6 @@ app.get("/user", async (req, res) => {
   const email = req?.query?.email;
   try {
     const user = await userModel.findOne({ email });
-    console.log(user);
     if (user?.id) res.send(user);
     else res.status(404).send({ message: "User not found" });
   } catch (err) {
@@ -52,6 +51,7 @@ app.patch("/user", async (req, res) => {
   try {
     const doc = await userModel.findByIdAndUpdate(data?.id, req?.body, {
       returnDocument: "after",
+      runValidators: true,
     });
     if (doc) {
       res.send({ message: "User updated successfully" });
