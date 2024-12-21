@@ -1,0 +1,19 @@
+{
+  "name": "devtinder",
+  "version": "1.0.0",
+  "description": "Node JS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/srinivasan-r23/DevTinder.git"
+  },
+  "author": "Srini",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/srinivasan-r23/DevTinder/issues"
+  },
+  "homepage": "https://github.com/srinivasan-r23/DevTinder#readme"
+}
