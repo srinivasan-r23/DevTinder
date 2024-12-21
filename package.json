@@ -20,6 +20,7 @@
   "homepage": "https://github.com/srinivasan-r23/DevTinder#readme",
   "dependencies": {
     "express": "^4.21.2",
-    "mongoose": "^8.9.2"
+    "mongoose": "^8.9.2",
+    "validator": "^13.12.0"
   }
 }
