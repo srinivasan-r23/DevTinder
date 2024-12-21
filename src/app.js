@@ -6,16 +6,8 @@ const app = express();
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-  const userObj = {
-    firstName: req?.body?.firstName,
-    lastName: req?.body?.lastName,
-    email: req?.body?.email,
-    password: req?.body?.password,
-    age: req?.body?.age,
-    gender: req?.body?.gender,
-  };
   try {
-    const user = new userModel(userObj);
+    const user = new userModel(req.body);
     await user.save();
     res.send({ message: "User saved successfully" });
   } catch (err) {
