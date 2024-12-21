@@ -1,15 +1,31 @@
 import express from "express";
+import { connectDB } from "./config/database.js";
+import userModel from "./models/user.js";
 
 const app = express();
+app.use(express.json());
 
-app.get("/getUserData", (req, res) => {
-  throw new Error("Random error");
-  res.send("User Data Sent");
-});
-
-app.use((err, req, res, next) => {
-  if (err) {
-    res.status(500).send("something went wrong");
+app.post("/signup", async (req, res) => {
+  const userObj = {
+    firstName: req?.body?.firstName,
+    lastName: req?.body?.lastName,
+    email: req?.body?.email,
+    password: req?.body?.password,
+    age: req?.body?.age,
+    gender: req?.body?.gender,
+  };
+  try {
+    const user = new userModel(userObj);
+    await user.save();
+    res.send({ message: "User saved successfully" });
+  } catch (err) {
+    res.status(500).send({ message: err.message });
   }
 });
-app.listen(3000, () => console.log("Server listening on Port 3000"));
+
+connectDB()
+  .then(() => {
+    console.log("DB connection established");
+    app.listen(3000, () => console.log("Server listening on Port 3000"));
+  })
+  .catch((err) => console.log(err));
