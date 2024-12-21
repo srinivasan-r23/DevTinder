@@ -46,10 +46,17 @@ app.get("/feed", async (req, res) => {
   }
 });
 
-app.patch("/user", async (req, res) => {
+app.patch("/user/:id", async (req, res) => {
   const data = req.body;
+  const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "password", "age"];
   try {
-    const doc = await userModel.findByIdAndUpdate(data?.id, req?.body, {
+    const isUpdateAllowed = Object.keys(data).every((update) =>
+      ALLOWED_UPDATES.includes(update)
+    );
+    if (!isUpdateAllowed) {
+      return res.status(400).send({ message: "Invalid update operation" });
+    }
+    const doc = await userModel.findByIdAndUpdate(req?.params?.id, req?.body, {
       returnDocument: "after",
       runValidators: true,
     });
