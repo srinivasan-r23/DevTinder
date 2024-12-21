@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/srinivasan-r23/DevTinder/issues"
   },
-  "homepage": "https://github.com/srinivasan-r23/DevTinder#readme"
+  "homepage": "https://github.com/srinivasan-r23/DevTinder#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
 }
