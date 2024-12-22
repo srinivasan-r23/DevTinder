@@ -1,15 +1,49 @@
 import express from "express";
 import { connectDB } from "./config/database.js";
 import userModel from "./models/user.js";
+import { validateSignUpData } from "./utils/validation.js";
+import bcrypt from "bcrypt";
+import validator from "validator";
 
 const app = express();
 app.use(express.json());
 
 app.post("/signup", async (req, res) => {
   try {
-    const user = new userModel(req.body);
+    //Validate
+    validateSignUpData(req);
+    const { firstName, lastName, email, password, about } = req?.body;
+    //Encrypt
+    const hashedPwd = await bcrypt.hash(password, 10);
+    console.log(hashedPwd);
+    //Create the user instance
+    const user = new userModel({
+      firstName,
+      lastName,
+      email,
+      password: hashedPwd,
+      about,
+    });
     await user.save();
     res.send({ message: "User saved successfully" });
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+});
+
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!validator.isEmail(email)) {
+      throw new Error("Invalid email address");
+    }
+    const user = await userModel.findOne({ email });
+    if (user?.id) {
+      const passwordValid = await bcrypt.compare(password, user?.password);
+      if (passwordValid) {
+        res.send({ message: "Login successful" });
+      } else res.status(401).send({ message: "Invalid credentials" });
+    } else throw new Error("Invalid credentials");
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
