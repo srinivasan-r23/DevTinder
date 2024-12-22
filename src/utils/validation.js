@@ -13,3 +13,20 @@ export const validateSignUpData = (req) => {
     throw new Error("Password must not be empty");
   }
 };
+
+export const validateEditProfile = (req, res) => {
+  const alllowedFields = [
+    "firstName",
+    "lastName",
+    "photoUrl",
+    "age",
+    "gender",
+    "about",
+    "skills",
+  ];
+  const isAllowed = Object.keys(req.body).every((field) =>
+    alllowedFields.includes(field)
+  );
+
+  return isAllowed;
+};
