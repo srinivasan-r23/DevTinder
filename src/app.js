@@ -4,9 +4,13 @@ import userModel from "./models/user.js";
 import { validateSignUpData } from "./utils/validation.js";
 import bcrypt from "bcrypt";
 import validator from "validator";
+import cookieParser from "cookie-parser";
+import jwt from "jsonwebtoken";
+import { userAuth } from "./middlewares/auth.js";
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
   try {
@@ -15,7 +19,6 @@ app.post("/signup", async (req, res) => {
     const { firstName, lastName, email, password, about } = req?.body;
     //Encrypt
     const hashedPwd = await bcrypt.hash(password, 10);
-    console.log(hashedPwd);
     //Create the user instance
     const user = new userModel({
       firstName,
@@ -41,6 +44,17 @@ app.post("/login", async (req, res) => {
     if (user?.id) {
       const passwordValid = await bcrypt.compare(password, user?.password);
       if (passwordValid) {
+        // Create a JWT token
+        const token = await jwt.sign(
+          { _id: user._id },
+          "SECRET_PASSWORD_FOR_JWT_DEV_NODE",
+          {
+            expiresIn: "1h",
+          }
+        );
+        // Add the token to cookie and send the response back to the user
+        res.cookie("token", token, { expires: new Date(Date.now() + 3600000) });
+
         res.send({ message: "Login successful" });
       } else res.status(401).send({ message: "Invalid credentials" });
     } else throw new Error("Invalid credentials");
@@ -48,6 +62,20 @@ app.post("/login", async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 });
+
+app.get("/profile", userAuth, async (req, res) => {
+  try {
+    const user = req?.user;
+    res.send(user);
+  } catch (err) {
+    res.status(401).send({ message: "Unauthorized" });
+  }
+});
+//Test the middleware
+// app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+//   const { firstName } = req?.user;
+//   res.send({ message: "Connection request sent", firstName });
+// });
 
 app.get("/user", async (req, res) => {
   const email = req?.query?.email;
