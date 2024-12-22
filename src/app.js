@@ -5,7 +5,6 @@ import { validateSignUpData } from "./utils/validation.js";
 import bcrypt from "bcrypt";
 import validator from "validator";
 import cookieParser from "cookie-parser";
-import jwt from "jsonwebtoken";
 import { userAuth } from "./middlewares/auth.js";
 
 const app = express();
