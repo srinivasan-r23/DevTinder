@@ -70,7 +70,6 @@ requestRouter.post(
       toUserId: user._id,
       status: "interested",
     });
-    console.log(connectionRequest);
     if (!connectionRequest) {
       return res.status(404).json({ message: "Request not found" });
     }

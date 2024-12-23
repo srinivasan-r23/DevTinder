@@ -1,6 +1,7 @@
 import express from "express";
 import { userAuth } from "../middlewares/auth.js";
 import ConnectionRequestModel from "../models/ConnectionRequest.js";
+import userModel from "../models/user.js";
 
 const userRouter = express.Router();
 
@@ -58,4 +59,40 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+userRouter.get("/user/feed", userAuth, async (req, res) => {
+  try {
+    const user = req.user;
+    const page = +req.query.page || 1;
+    let limit = +req.query.limit || 10;
+    limit = limit > 50 ? 50 : limit;
+
+    const connections = await ConnectionRequestModel.find({
+      $or: [
+        {
+          fromUserId: user._id,
+        },
+        { toUserId: user._id },
+      ],
+    }).select("toUserId fromUserId");
+    const hideUsersFromFeed = new Set();
+    connections.forEach((req) => {
+      hideUsersFromFeed.add(req.toUserId.toString());
+      hideUsersFromFeed.add(req.fromUserId.toString());
+    });
+
+    const users = await userModel
+      .find({
+        _id: { $nin: [...hideUsersFromFeed, user._id] },
+      })
+      .select("firstName lastName photoUrl about skills")
+      .limit(limit)
+      .skip((page - 1) * limit);
+
+    res.send(users);
+  } catch (error) {
+    res.send(500).json({ message: error.message });
+  }
+});
+
 export default userRouter;
